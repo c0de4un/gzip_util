@@ -44,3 +44,9 @@
 #include <cstdlib> // C++
 #include <cstdint> // C++ numerics
 #include <string> // std::string, std::wstring
+
+// Include zlib.h
+#include <zlib.h>
+
+// Include zlib-config
+#include <zconf.h>

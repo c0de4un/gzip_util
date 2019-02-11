@@ -33,4 +33,11 @@
 
 #pragma once
 
+// Include 'precompiled-headers'
 #include "pch_cxx.hpp"
+
+// Include ZStream
+#include "zip/ZStream.hpp"
+
+/* Help Command-ID */
+static constexpr std::uint8_t CONSOLE_COMMAND_ID_HELP = 0;

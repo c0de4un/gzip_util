@@ -26,7 +26,7 @@ cmake_minimum_required ( VERSION 3.8 FATAL_ERROR )
 set ( ROOT_PROJECT_NAME "gzip_util" )
 
 # Project Version
-set ( ROOT_PROJECT_VERSION 0.0.1 )
+set ( ROOT_PROJECT_VERSION 0.1.0 )
 
 # Configure Project
 project ( ${ROOT_PROJECT_NAME} VERSION ${ROOT_PROJECT_VERSION} LANGUAGES C CXX )
@@ -99,7 +99,7 @@ elseif ( ANDROID ) # Android NDK
 elseif ( UNIX OR CMAKE_COMPILER_IS_GNUCXX ) # Clang || gcc (Linux, Mac OS or Win32 with MingW)
 
 	# Flags
-	set ( CMAKE_CXX_FLAGS "-Wall -std=c++17" )
+	set ( CMAKE_CXX_FLAGS "-Wall -std=c++17 -EHsc" )
 
 	# Apple
 	if ( APPLE ) # Clang / Mac OS only
@@ -129,17 +129,63 @@ set ( ROOT_PROJECT_LIBS_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/libs/include" )
 
 # =============== zlib ====================
 
+# PLATFORM
+if ( WIN32 ) # WINDOWS
+	# Z-LIB LIB LOCATION
+	set ( ZLIB_LIB_LOCATION "${ROOT_PROJECT_LIBS_DIR}/zlib/release/win32/x86_32/zlib.lib" )
+
+	# Z-LIB INCLUDES
+	set ( ZLIB_INCLUDE_DIR "${ROOT_PROJECT_LIBS_INCLUDE_DIR}/win32/zlib" )
+elseif ( LINUX )
+	# ERROR
+	message ( FATAL_ERROR "${ROOT_PROJECT_NAME} - missing Linux configuration ! Configuration required." )
+else ( WIN32 )
+	# ERROR
+	message ( FATAL_ERROR "${ROOT_PROJECT_NAME} - unknown platform ! Configuration required." )
+endif ( WIN32 ) # WINDOWS
+
+# Check Z-LIB LOCATION
+if ( NOT EXISTS ${ZLIB_LIB_LOCATION} )
+	# ERROR
+	message ( FATAL_ERROR "${ROOT_PROJECT_NAME} - zlib not found at ${ZLIB_LIB_LOCATION}" )
+else ( NOT EXISTS ${ZLIB_LIB_LOCATION} )
+	# INFO
+	message ( STATUS "${ROOT_PROJECT_NAME} - zlib found at ${ZLIB_LIB_LOCATION}" )
+endif ( NOT EXISTS ${ZLIB_LIB_LOCATION} )
+
+# Check Z-LIB INCLUDE DIR
+if ( NOT EXISTS "${ZLIB_INCLUDE_DIR}/zlib.h" )
+	# ERROR
+	message ( FATAL_ERROR "${ROOT_PROJECT_NAME} - zlib includes not found at ${ZLIB_INCLUDE_DIR}" )
+else ( NOT EXISTS "${ZLIB_INCLUDE_DIR}/zlib.h" )
+	# INFO
+	message ( STATUS "${ROOT_PROJECT_NAME} - zlib includes found at ${ZLIB_INCLUDE_DIR}" )
+endif ( NOT EXISTS "${ZLIB_INCLUDE_DIR}/zlib.h" )
+
+# Add STATIC zlib Library
+add_library( zlib STATIC IMPORTED )
+
+# Set zlib Library-Object Properties
+set_target_properties( zlib PROPERTIES
+IMPORTED_LOCATION "${ZLIB_LIB_LOCATION}" 
+INTERFACE_INCLUDE_DIRECTORIES "${ZLIB_INCLUDE_DIR}" )
+
+# INFO
+message ( STATUS "${ROOT_PROJECT_NAME} - zlib Imported as STATIC Library" )
+
 # =================================================================================
 # HEADERS
 # =================================================================================
 
-set ( ROOT_PROJECT_HEADERS "${SOURCES_DIR}/main.hpp" )
+set ( ROOT_PROJECT_HEADERS "${SOURCES_DIR}/main.hpp"
+"${SOURCES_DIR}/zip/ZStream.hpp" )
 
 # =================================================================================
 # SOURCES
 # =================================================================================
 
-set ( ROOT_PROJECT_SOURCES "${SOURCES_DIR}/main.cpp" )
+set ( ROOT_PROJECT_SOURCES "${SOURCES_DIR}/main.cpp"
+"${SOURCES_DIR}/zip/ZStream.cpp" )
 
 # =================================================================================
 # PRECOMPILED HEADERS
@@ -180,7 +226,7 @@ if ( WIN32 ) # WINDOWS
 	RUNTIME_OUTPUT_DIRECTORY ${ROOT_PROJECT_OUTPUT_DIR} )
 	
 	# Link
-	target_link_libraries ( gzip_util ${zlib} )
+	target_link_libraries ( gzip_util zlib )
 
 	# Request features
 	target_compile_features ( gzip_util PRIVATE cxx_std_17 )
