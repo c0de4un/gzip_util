@@ -354,14 +354,9 @@ int main( int argC, char * argV[] )
 	// DEBUG-message
 	std::cout << "compressing..." << std::endl;
 
-	//
-	char * fileName = "test_img.jpeg";
-
-	//
-	char * files[]{ fileName };
 
 	// Compress files
-	compressFile( "", "", 6 );
+	compressFile( "../../../test/test_img.jpeg", "compressionResult/test_img.zip", 6 );
 
 	// DEBUG-message
 	std::cout << "compressing complete =^-^=" << std::endl;
@@ -370,7 +365,7 @@ int main( int argC, char * argV[] )
 	std::cout << "decompressing..." << std::endl;
 
 	// Decompress
-	decompressFile( "test_img.gzip", "decompressionResults/test_img.jpeg" );
+	decompressFile( "compressionResult/test_img.zip", "decompressionResults/test_img.jpeg" );
 
 	// DEBUG-message
 	std::cout << "decompressing complete =^-^=" << std::endl;
